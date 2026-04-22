@@ -1,0 +1,1130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - MySite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #e53e3e;
+            --primary-light: #feb2b2;
+            --primary-dark: #c53030;
+            --primary-bg: #fff5f5;
+            --secondary: #1a202c;
+            --accent: #fc8181;
+            --danger: #e53e3e;
+            --success: #38a169;
+            --warning: #ecc94b;
+            --info: #4299e1;
+            --light: #f7fafc;
+            --dark: #1a202c;
+            --gray-100: #f7fafc;
+            --gray-200: #edf2f7;
+            --gray-300: #e2e8f0;
+            --gray-400: #cbd5e0;
+            --gray-500: #a0aec0;
+            --gray-600: #718096;
+            --gray-700: #4a5568;
+            --gray-800: #2d3748;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-colored: 0 10px 15px -3px rgba(229, 62, 62, 0.1), 0 4px 6px -2px rgba(229, 62, 62, 0.05);
+            --border-radius: 1rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 70px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 50%, #fff5f5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-200);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Main content wrapper */
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Content area */
+        .content-area {
+            flex: 1;
+            margin-left: var(--sidebar-collapsed);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: calc(100% - var(--sidebar-collapsed));
+            min-height: 100vh;
+        }
+
+        /* When sidebar is hovered */
+        body:has(.sidebar:hover) .content-area {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-light);
+            box-shadow: var(--shadow);
+            padding: 20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title p {
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px 8px 12px;
+            background: var(--white);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-profile:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--primary-light);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--gray-800);
+        }
+
+        .user-role {
+            font-size: 12px;
+        }
+
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-badge.admin {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-colored);
+        }
+
+        /* Student Selector */
+        .student-selector {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
+            margin: 25px 30px;
+            border: 1px solid rgba(229, 62, 62, 0.1);
+        }
+
+        .student-selector h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .student-selector h3 i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: var(--transition);
+            background: var(--white);
+            cursor: pointer;
+            color: var(--gray-800);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23e53e3e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .container {
+            padding: 0 30px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 35px;
+            box-shadow: var(--shadow-xl);
+            flex: 1;
+            max-width: 500px;
+            border: 1px solid rgba(229, 62, 62, 0.1);
+            transition: var(--transition);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 40px -20px rgba(229, 62, 62, 0.3);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-header p {
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .profile-picture-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 35px;
+            padding-bottom: 30px;
+            border-bottom: 2px dashed var(--gray-200);
+        }
+
+        .profile-preview {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--white);
+            box-shadow: 0 0 0 3px var(--primary), 0 20px 25px -8px rgba(229, 62, 62, 0.4);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .profile-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px var(--primary), 0 25px 30px -8px rgba(229, 62, 62, 0.5);
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: var(--shadow-colored);
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -8px rgba(229, 62, 62, 0.5);
+        }
+
+        .file-input-label i {
+            font-size: 18px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--gray-800);
+            font-weight: 500;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .form-input:disabled {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: not-allowed;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 15px;
+            width: 100%;
+            justify-content: center;
+            letter-spacing: 0.3px;
+            box-shadow: var(--shadow-colored);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -8px rgba(229, 62, 62, 0.5);
+        }
+
+        .btn i {
+            font-size: 18px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--gray-700), var(--gray-800));
+        }
+
+        /* Info Card */
+        .info-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 35px;
+            box-shadow: var(--shadow-xl);
+            flex: 1;
+            border: 1px solid rgba(229, 62, 62, 0.1);
+            transition: var(--transition);
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 40px -20px rgba(229, 62, 62, 0.3);
+        }
+
+        .info-section {
+            margin-bottom: 35px;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .info-section h3 i {
+            color: var(--primary);
+            font-size: 22px;
+            background: var(--primary-light);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--gray-100);
+            padding: 15px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .info-item:hover {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-success {
+            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+            color: #22543d;
+        }
+
+        .badge-primary {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            color: #822727;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--gray-800), var(--gray-900));
+            color: white;
+            padding: 25px 30px;
+            margin-top: 50px;
+            border-top: 4px solid var(--primary);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            color: var(--gray-400);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: var(--gray-300);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .student-selector { animation-delay: 0.1s; }
+        .profile-card { animation-delay: 0.2s; }
+        .info-card { animation-delay: 0.3s; }
+
+        /* Progress bars */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            transition: width 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .profile-card,
+            .info-card {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-collapsed: 0;
+            }
+            
+            .content-area {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar.active {
+                width: 260px !important;
+                z-index: 1000;
+            }
+            
+            .sidebar.active ~ .main-wrapper .content-area {
+                margin-left: 260px !important;
+                width: calc(100% - 260px) !important;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .student-selector {
+                margin: 15px;
+                padding: 20px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-preview {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            
+            .info-item {
+                padding: 12px;
+            }
+            
+            .info-value {
+                font-size: 16px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- INCLUDE NAVIGATION -->
+    {% include 'navigation.html' %}
+
+    <!-- Mobile Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <div class="content-area">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <h1><i class="fas fa-user-graduate" style="margin-right: 10px;"></i>Student Profile</h1>
+                        <p>Manage student information and academic details</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="user-profile">
+                            <img src="{% static 'Information_System/images/archi.jpg' %}" 
+                                 onerror="this.src='{% static 'images/default-avatar.png' %}'"
+                                 alt="User Avatar" class="user-avatar">
+                            <div class="user-info">
+                                <span class="user-name">Administrator</span>
+                                <span class="user-role">
+                                    <span class="role-badge admin">Admin</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Student Selector -->
+            <div class="student-selector fade-in">
+                <h3><i class="fas fa-users"></i> Select Student</h3>
+                <select id="studentSelect" class="form-select" onchange="loadStudentData(this.value)">
+                    <option value="">-- Choose a student from the list --</option>
+                    {% for student in students %}
+                    <option value="{{ student.id }}" 
+                            {% if selected_student and selected_student.id == student.id %}selected{% endif %}>
+                        {{ student.name }} - {{ student.student_number }}
+                    </option>
+                    {% empty %}
+                    <option value="">No students found in database</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <main class="container">
+                <!-- Profile Form Card -->
+                <div class="profile-card fade-in">
+                    <div class="profile-header">
+                        <h2>Profile Settings</h2>
+                        <p>Update student personal information</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" id="profileForm">
+                        {% csrf_token %}
+                        <input type="hidden" id="studentId" name="student_id" value="{{ selected_student.id|default:'' }}">
+
+                        <!-- Profile Picture Section -->
+                        <div class="profile-picture-section">
+                            <img id="profilePreview"
+                                 src="{% if selected_student and selected_student.profile_picture %}{{ selected_student.profile_picture.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                                 alt="Profile Picture"
+                                 class="profile-preview">
+                            <label for="profilePicture" class="file-input-label">
+                                <i class="fas fa-camera"></i>
+                                Change Photo
+                            </label>
+                            <input type="file" id="profilePicture" name="profile_picture" class="file-input" accept="image/*"
+                                   onchange="previewImage(event)">
+                        </div>
+
+                        <!-- Student Name -->
+                        <div class="form-group">
+                            <label for="student_name" class="form-label">
+                                <i class="fas fa-user" style="margin-right: 5px; color: var(--primary);"></i>
+                                Full Name
+                            </label>
+                            <input type="text" id="student_name" name="student_name"
+                                   value="{{ selected_student.name|default:'' }}"
+                                   class="form-input"
+                                   placeholder="Enter student's full name">
+                        </div>
+
+                        <!-- Student Number -->
+                        <div class="form-group">
+                            <label for="student_number" class="form-label">
+                                <i class="fas fa-id-card" style="margin-right: 5px; color: var(--primary);"></i>
+                                Student Number
+                            </label>
+                            <input type="text" id="student_number" name="student_number"
+                                   value="{{ selected_student.student_number|default:'' }}"
+                                   class="form-input"
+                                   placeholder="e.g. 2024-0001">
+                        </div>
+
+                        <!-- Course -->
+                        <div class="form-group">
+                            <label for="course" class="form-label">
+                                <i class="fas fa-book" style="margin-right: 5px; color: var(--primary);"></i>
+                                Course
+                            </label>
+                            <input type="text" id="course" name="course"
+                                   value="{{ selected_student.course|default:'' }}"
+                                   class="form-input"
+                                   placeholder="e.g. Bachelor of Science in Computer Science">
+                        </div>
+
+                        <!-- Academic Year -->
+                        <div class="form-group">
+                            <label for="academic_year" class="form-label">
+                                <i class="fas fa-calendar" style="margin-right: 5px; color: var(--primary);"></i>
+                                Academic Year
+                            </label>
+                            <input type="text" id="academic_year" name="academic_year"
+                                   value="{{ selected_student.academic_year|default:'2025-2026' }}"
+                                   class="form-input"
+                                   placeholder="e.g. 2025-2026">
+                        </div>
+
+                        <!-- Save Button -->
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </form>
+
+                    <!-- Back to Dashboard -->
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="margin-top: 15px;">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+
+                <!-- Student Information Card -->
+                <div class="info-card fade-in">
+                    {% if selected_student %}
+                    <div class="info-section">
+                        <h3><i class="fas fa-graduation-cap"></i> Academic Information</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Student Name</span>
+                                <span class="info-value">{{ selected_student.name|default:"Not Set" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Student Number</span>
+                                <span class="info-value">{{ selected_student.student_number|default:"Not Set" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Course</span>
+                                <span class="info-value">{{ selected_student.course|default:"Not Set" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Academic Year</span>
+                                <span class="info-value">{{ selected_student.academic_year|default:"Not Set" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-chart-line"></i> Performance Overview</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Individual Performance</span>
+                                <span class="info-value">{{ individual|default:"0" }}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ individual|default:'0' }}%"></div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Integration</span>
+                                <span class="info-value">{{ integration|default:"0" }}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ integration|default:'0' }}%"></div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Overall Performance</span>
+                                <span class="info-value">{{ overall|default:"0" }}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ overall|default:'0' }}%"></div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
+                                    Active
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-info-circle"></i> Account Information</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Member Since</span>
+                                <span class="info-value">{{ selected_student.date_joined|date:"F Y"|default:"January 2024" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Last Updated</span>
+                                <span class="info-value">{{ selected_student.updated_at|date:"M j, Y"|default:"Today" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Account Type</span>
+                                <span class="badge badge-primary">
+                                    <i class="fas fa-user-graduate" style="margin-right: 5px;"></i>
+                                    Student
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Profile Status</span>
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
+                                    Complete
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="info-section" style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-user-graduate" style="font-size: 60px; color: var(--primary-light); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--gray-700); margin-bottom: 10px;">No Student Selected</h3>
+                        <p style="color: var(--gray-600);">Please select a student from the dropdown above to view and edit their information.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-copyright">
+                        <i class="far fa-copyright" style="margin-right: 5px;"></i>
+                        2024 MySite Student Portal. All rights reserved.
+                    </div>
+                    <div class="footer-links">
+                        <a href="#"><i class="fas fa-shield-alt" style="margin-right: 5px;"></i>Privacy</a>
+                        <a href="#"><i class="fas fa-file-contract" style="margin-right: 5px;"></i>Terms</a>
+                        <a href="#"><i class="fas fa-headset" style="margin-right: 5px;"></i>Support</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            function toggleSidebar() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('active');
+                }
+            }
+            
+            function updateMenuToggle() {
+                if (window.innerWidth <= 768) {
+                    menuToggle.style.display = 'flex';
+                } else {
+                    menuToggle.style.display = 'none';
+                }
+            }
+            
+            updateMenuToggle();
+            menuToggle.addEventListener('click', toggleSidebar);
+            window.addEventListener('resize', updateMenuToggle);
+
+            // Add loading animation to form submission
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    submitBtn.disabled = true;
+                });
+            }
+
+            // Animate progress bars on load
+            const progressFills = document.querySelectorAll('.progress-fill');
+            progressFills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 500);
+            });
+        });
+
+        // Image preview before upload
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const preview = document.getElementById('profilePreview');
+                preview.src = reader.result;
+                preview.style.animation = 'pulse 0.5s ease';
+                setTimeout(() => {
+                    preview.style.animation = '';
+                }, 500);
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Load student data when selection changes
+        function loadStudentData(studentId) {
+            if (studentId) {
+                document.getElementById('studentId').value = studentId;
+                window.location.href = `{% url 'profile' %}?student_id=${studentId}`;
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            const studentId = document.getElementById('studentId').value;
+            if (!studentId) {
+                e.preventDefault();
+                alert('⚠️ Please select a student first.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,960 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Individual Course Grades - MySite</title>
+
+  <style>
+    :root {
+      --primary: #e74c3c;
+      --primary-dark: #c0392b;
+      --primary-light: #fadbd8;
+      --secondary: #2c3e50;
+      --accent: #e67e22;
+      --danger: #c0392b;
+      --warning: #f39c12;
+      --light: #fadbd8;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --gray: #95a5a6;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(192, 57, 43, 0.1);
+      --shadow-lg: 0 10px 15px rgba(192, 57, 43, 0.15);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+      --gradient-primary: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fadbd8 0%, #f5b7b1 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--secondary) 0%, #34495e 100%);
+      color: var(--white);
+      box-shadow: var(--shadow-lg);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      z-index: 1000;
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar:hover {
+      width: 260px;
+    }
+
+    .brand {
+      padding: 25px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: none;
+      flex-direction: column;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--white);
+    }
+
+    .brand p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin: 0;
+    }
+
+    .sidebar:hover .brand-text {
+      display: flex;
+    }
+
+    .nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 15px;
+    }
+
+    .side-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      color: var(--white);
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      margin: 5px 0;
+      transition: var(--transition);
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .side-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary);
+      transform: scaleY(0);
+      transition: var(--transition);
+    }
+
+    .side-item:hover::before,
+    .side-item.active::before {
+      transform: scaleY(1);
+    }
+
+    .side-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+
+    .side-item.active {
+      background: rgba(231, 76, 60, 0.2);
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .side-item:hover .icon {
+      background: var(--primary);
+      transform: scale(1.1);
+    }
+
+    .text {
+      display: none;
+      font-weight: 500;
+    }
+
+    .sidebar:hover .text {
+      display: block;
+    }
+
+    /* Main Content */
+    .content-wrap {
+      margin-left: 80px;
+      width: calc(100% - 80px);
+      transition: var(--transition);
+      min-height: 100vh;
+    }
+
+    .sidebar:hover ~ .content-wrap {
+      margin-left: 260px;
+      width: calc(100% - 260px);
+    }
+
+    /* Header */
+    .header {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 20px 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-title h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 5px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-title p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .student-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--light);
+      padding: 5px 10px;
+      border-radius: 50px;
+      border: 1px solid var(--primary-light);
+    }
+
+    .student-selector form {
+      display: flex;
+      align-items: center;
+    }
+
+    .student-selector select {
+      padding: 8px 15px;
+      border: 1px solid var(--primary-light);
+      border-radius: 20px;
+      background: var(--white);
+      font-size: 14px;
+      min-width: 250px;
+      cursor: pointer;
+      color: var(--dark);
+    }
+
+    .student-selector select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+    }
+
+    .btn-clear {
+      padding: 8px 15px;
+      background: var(--gray);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-clear:hover {
+      background: #7f8c8d;
+      transform: translateY(-2px);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 15px;
+      background: var(--light);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid var(--primary-light);
+    }
+
+    .user-profile:hover {
+      background: #f5b7b1;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--primary-dark);
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .role-badge {
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .role-badge.admin {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    /* Container */
+    .container {
+      padding: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .student-info {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 20px 25px;
+      border-radius: var(--border-radius);
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .student-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .student-details {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      border-top: 4px solid var(--primary);
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card:nth-child(2) {
+      border-top-color: var(--success);
+    }
+    .stat-card:nth-child(3) {
+      border-top-color: var(--accent);
+    }
+    .stat-card:nth-child(4) {
+      border-top-color: var(--warning);
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--gray);
+      font-weight: 600;
+    }
+
+    .content-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light);
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: var(--light);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--dark);
+      transition: var(--transition);
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .tab:hover {
+      background: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .tab.disabled {
+      background: #bdc3c7;
+      color: #7f8c8d;
+      cursor: not-allowed;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .course-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--primary);
+      transition: var(--transition);
+      position: relative;
+      border: 1px solid var(--primary-light);
+    }
+
+    .course-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .course-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .course-code {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 5px;
+    }
+
+    .course-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    .course-status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .status-not-taken {
+      background: #f8f9fa;
+      color: var(--gray);
+      border: 1px solid #dee2e6;
+    }
+
+    .course-meta {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .grade-display {
+      float: right;
+      margin-left: 15px;
+      text-align: right;
+      min-width: 80px;
+    }
+
+    .grade-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .grade-day {
+      font-size: 12px;
+      color: var(--gray);
+      margin-bottom: 2px;
+    }
+
+    .grade-status {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #ecf0f1;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-success {
+      background: var(--success);
+    }
+    .btn-success:hover {
+      background: #219a52;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+    }
+    .btn-warning:hover {
+      background: #e67e22;
+    }
+
+    .btn-secondary {
+      background: var(--gray);
+    }
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+
+    .no-data i {
+      font-size: 64px;
+      color: var(--gray);
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .no-data h3 {
+      color: var(--secondary);
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .no-data p {
+      color: var(--gray);
+      font-size: 16px;
+    }
+
+    .footer {
+      background: var(--secondary);
+      color: white;
+      padding: 20px 30px;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: var(--transition);
+      font-size: 14px;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 0;
+      }
+      .content-wrap {
+        margin-left: 0;
+        width: 100%;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .student-selector {
+        width: 100%;
+      }
+      .student-selector select {
+        flex: 1;
+        min-width: auto;
+      }
+      .container {
+        padding: 20px;
+      }
+      .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+      .tabs {
+        flex-direction: column;
+      }
+      .tab {
+        width: 100%;
+        justify-content: center;
+      }
+      .course-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .grade-display {
+        float: none;
+        margin-left: 0;
+        text-align: left;
+      }
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div class="brand-text"><h1>MySite</h1><p>Student Portal</p></div>
+    </div>
+    <div class="nav">
+      <a href="{% url 'dashboard' %}" class="side-item"><div class="icon"><i class="fas fa-tachometer-alt"></i></div><span class="text">Dashboard</span></a>
+      <a href="{% url 'profile' %}" class="side-item"><div class="icon"><i class="fas fa-user"></i></div><span class="text">Profile</span></a>
+      <a href="{% url 'student_list' %}" class="side-item"><div class="icon"><i class="fas fa-users"></i></div><span class="text">Students</span></a>
+      <a href="{% url 'individual' %}" class="side-item active"><div class="icon"><i class="fas fa-book"></i></div><span class="text">Individual Grades</span></a>
+      <a href="{% url 'logout' %}" class="side-item"><div class="icon"><i class="fas fa-sign-out-alt"></i></div><span class="text">Logout</span></a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="content-wrap">
+    <header class="header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Individual Course Grades</h1>
+          <p>Manage and view individual course performance</p>
+        </div>
+        <div class="header-actions">
+          <div class="student-selector">
+            <form method="get" action="{% url 'individual' %}" id="student-selector-form">
+              <select name="student_id" onchange="document.getElementById('student-selector-form').submit();">
+                <option value="">-- Select Student --</option>
+                {% for student in students %}
+                  <option value="{{ student.id }}" {% if active_student and active_student.id == student.id %}selected{% endif %}>
+                    {{ student.name }} ({{ student.student_number }})
+                  </option>
+                {% endfor %}
+              </select>
+            </form>
+            {% if active_student %}
+              <a href="{% url 'individual' %}" class="btn-clear"><i class="fas fa-times"></i> Clear</a>
+            {% endif %}
+          </div>
+          <div class="user-profile">
+            <img src="{% static 'images/default-avatar.png' %}" alt="User Avatar" class="user-avatar">
+            <div class="user-info">
+              <span class="user-name">{{ request.user.username }}</span>
+              <span class="role-badge admin">Admin</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Student Info -->
+      <div class="student-info fade-in">
+        <div class="student-name">{{ student_name|default:"No Student Selected" }}</div>
+        <div class="student-details">
+          {% if active_student %}
+            Student ID: {{ student_number|default:active_student.student_number }} • {{ student_course|default:active_student.course }} • Academic Year: {{ student_academic_year|default:active_student.academic_year }}
+          {% else %}
+            Please select a student from the dropdown above to view or manage their grades
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Statistics Grid -->
+      <div class="stats-grid fade-in">
+        <div class="stat-card"><div class="stat-value" style="color: var(--primary);">{{ completed_courses|default:"0" }}</div><div class="stat-label">Courses Completed</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--success);">{{ average_grade|default:"0" }}%</div><div class="stat-label">Average Grade</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--accent);">{{ pass_rate|default:"0" }}%</div><div class="stat-label">Pass Rate</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--warning);">{{ total_courses|default:"0" }}</div><div class="stat-label">Total Courses</div></div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content-card fade-in">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fas fa-chart-line"></i> Course Performance</h2>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <a href="?{% if active_student %}student_id={{ active_student.id }}&{% endif %}tab=view" class="tab {% if active_tab == 'view' or not active_tab %}active{% endif %}"><i class="fas fa-eye"></i> View Grades</a>
+          <a href="?{% if active_student %}student_id={{ active_student.id }}&{% endif %}tab=add" class="tab {% if active_tab == 'add' %}active{% endif %}"><i class="fas fa-plus"></i> Add Grade</a>
+          <a href="?{% if active_student %}student_id={{ active_student.id }}&{% endif %}tab=update" class="tab {% if active_tab == 'update' %}active{% endif %}"><i class="fas fa-edit"></i> Update Grades</a>
+        </div>
+
+        <!-- VIEW GRADES TAB -->
+        {% if active_tab == 'view' or not active_tab %}
+        <div id="view-grades" class="tab-content active">
+          {% if subjects %}
+          <div class="courses-grid">
+            {% for subject in subjects %}
+            <div class="course-card">
+              <div class="course-header">
+                <div><div class="course-code">{{ subject.code }}</div><div class="course-name">{{ subject.name }}</div></div>
+                {% if subject.score %}
+                <div class="grade-display">
+                  <div class="grade-value" style="color: {% if subject.score >= 75 %}var(--success){% else %}var(--danger){% endif %};">{{ subject.score }}%</div>
+                  <div class="grade-day">Current Grade</div>
+                  <div class="grade-status" style="color: {% if subject.score >= 75 %}var(--success){% else %}var(--danger){% endif %};">{{ subject.status|default:"-" }}</div>
+                </div>
+                {% else %}
+                <span class="course-status status-not-taken">NOT TAKEN</span>
+                {% endif %}
+              </div>
+              <div class="course-meta">
+                <div class="meta-item"><i class="fas fa-book"></i> <span>{{ subject.code }}</span></div>
+                <div class="meta-item"><i class="fas fa-chart-bar"></i> <span>{% if subject.score %}{% if subject.score >= 90 %}Excellent{% elif subject.score >= 80 %}Very Good{% elif subject.score >= 75 %}Good{% else %}Needs Improvement{% endif %}{% else %}Not Yet Taken{% endif %}</span></div>
+              </div>
+              <div style="margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span style="font-size: 12px; color: var(--gray);">Progress</span><span style="font-size: 12px; font-weight: 600;">{% if subject.score %}{{ subject.score }}%{% else %}0%{% endif %}</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width: {% if subject.score %}{{ subject.score }}%{% else %}0%{% endif %}; background: {% if subject.score >= 75 %}var(--success){% else %}var(--danger){% endif %};"></div></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div style="text-align: right; margin-top: 10px; color: var(--gray);"><i class="fas fa-list"></i> Showing {{ subjects|length }} courses</div>
+          {% else %}
+          <div class="no-data"><i class="fas fa-database"></i><h3>No Data Available</h3><p>{% if not active_student %}Please select a student to view their courses.{% else %}There are no courses to display at the moment.{% endif %}</p></div>
+          {% endif %}
+          <div class="action-buttons">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            {% if active_student %}<a href="?student_id={{ active_student.id }}&tab=add" class="btn btn-success"><i class="fas fa-plus"></i> Add Grades</a>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- ADD GRADE TAB - REDIRECT TO add_individual_grade.html -->
+        {% if active_tab == 'add' %}
+        <div id="add-grade" class="tab-content active">
+          <div class="no-data" style="padding: 40px;">
+            <i class="fas fa-plus-circle" style="font-size: 48px; color: var(--primary);"></i>
+            <h3>Add New Grades</h3>
+            <p>You will be redirected to the grade entry page.</p>
+            <a href="{% url 'add_individual_grade' %}?student_id={{ active_student.id }}" class="btn btn-success" style="margin-top: 20px;"><i class="fas fa-arrow-right"></i> Go to Add Grades Page</a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- UPDATE GRADES TAB - REDIRECT TO update_grades.html -->
+        {% if active_tab == 'update' %}
+        <div id="update-grades" class="tab-content active">
+          <div class="no-data" style="padding: 40px;">
+            <i class="fas fa-edit" style="font-size: 48px; color: var(--warning);"></i>
+            <h3>Update Existing Grades</h3>
+            <p>You will be redirected to the grade update page.</p>
+            <a href="{% url 'update_grades' %}?student_id={{ active_student.id }}" class="btn btn-warning" style="margin-top: 20px;"><i class="fas fa-arrow-right"></i> Go to Update Grades Page</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-copyright">&copy; 2025 MySite Student Portal. All rights reserved.</div>
+        <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Contact Support</a></div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const studentSelect = document.querySelector('select[name="student_id"]');
+      if (studentSelect) {
+        studentSelect.addEventListener('change', function() { this.form.submit(); });
+      }
+    });
+  </script>
+</body>
+</html>

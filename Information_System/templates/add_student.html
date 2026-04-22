@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Student - Architecture Department{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #e74c3c;
+        --primary-dark: #c0392b;
+        --secondary: #2c3e50;
+        --accent: #e67e22;
+        --danger: #e74c3c;
+        --warning: #f39c12;
+        --light: #ecf0f1;
+        --dark: #2c3e50;
+        --success: #27ae60;
+        --gray: #95a5a6;
+        --white: #ffffff;
+        --shadow: 0 4px 6px rgba(231, 76, 60, 0.1);
+        --shadow-lg: 0 10px 15px rgba(231, 76, 60, 0.1);
+        --border-radius: 12px;
+        --transition: all 0.3s ease;
+        --sidebar-width: 280px;
+        --sidebar-collapsed: 70px;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #fef5f5 0%, #fde3e3 100%);
+        color: var(--dark);
+        line-height: 1.6;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* FIX FOR SIDEBAR OVERLAP */
+    .content-wrap {
+        margin-left: var(--sidebar-collapsed) !important;
+        width: calc(100% - var(--sidebar-collapsed)) !important;
+        transition: margin-left 0.3s ease, width 0.3s ease;
+        min-height: 100vh;
+    }
+
+    /* When sidebar is hovered/expanded */
+    .sidebar:hover ~ .content-wrap,
+    .sidebar:hover + .content-wrap {
+        margin-left: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+    }
+
+    /* Header */
+    .header {
+        background: var(--white);
+        box-shadow: var(--shadow);
+        padding: 20px 30px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 3px solid var(--primary);
+        width: 100%;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-title h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+
+    .header-title p {
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 15px;
+        background: linear-gradient(135deg, #fef5f5, #fde3e3);
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid var(--primary);
+    }
+
+    .user-profile:hover {
+        background: linear-gradient(135deg, #fde3e3, #fccbcb);
+        transform: translateY(-2px);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary);
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--primary);
+    }
+
+    .user-role {
+        font-size: 12px;
+        color: var(--gray);
+    }
+
+    .role-badge {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .role-badge.admin {
+        background: var(--primary);
+        color: white;
+    }
+
+    /* Main Container */
+    .container {
+        padding: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Form Container */
+    .form-container {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(231, 76, 60, 0.2);
+        margin-top: 20px;
+        border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .form-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
+
+    .form-header h1 i {
+        color: var(--primary);
+        margin-right: 10px;
+    }
+
+    .form-header p {
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid rgba(231, 76, 60, 0.1);
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        color: var(--primary);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-label i {
+        color: var(--primary);
+        margin-right: 8px;
+    }
+
+    .required::after {
+        content: ' *';
+        color: var(--primary);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(231, 76, 60, 0.1);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: var(--transition);
+        background: var(--white);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid rgba(231, 76, 60, 0.1);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-success {
+        background: var(--primary);
+    }
+
+    .btn-success:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+        background: var(--gray);
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+
+    /* NO FOOTER - REMOVED COMPLETELY */
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        :root {
+            --sidebar-collapsed: 50px;
+        }
+
+        .header-content {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease;
+    }
+</style>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-content">
+        <div class="header-title">
+            <h1>Add New Student</h1>
+            <p>Register a new student in the system</p>
+        </div>
+        <div class="header-actions">
+            <div class="user-profile">
+                <img src="{% static 'images/default-avatar.png' %}" alt="User Avatar" class="user-avatar">
+                <div class="user-info">
+                    <span class="user-name">Admin</span>
+                    <span class="role-badge admin">Administrator</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="form-container fade-in">
+        <div class="form-header">
+            <h1><i class="fas fa-user-plus"></i> Student Registration</h1>
+            <p>Fill in the student's information below. Fields marked with <span style="color: var(--primary);">*</span> are required.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-id-card"></i>
+                    Personal Information
+                </h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-user"></i>
+                            Full Name
+                        </label>
+                        <input type="text" name="name" class="form-control" 
+                               placeholder="Enter student's full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-id-badge"></i>
+                            Student Number
+                        </label>
+                        <input type="text" name="student_number" class="form-control"
+                               placeholder="e.g., 2024-001" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    Academic Information
+                </h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-book"></i>
+                            Course/Program
+                        </label>
+                        <select name="course" class="form-control" required>
+                            <option value="">Select a course</option>
+                            <option value="BS Architecture">BS Architecture</option>
+                            <option value="BS Civil Engineering">BS Civil Engineering</option>
+                            <option value="BS Computer Science">BS Computer Science</option>
+                            <option value="BS Information Technology">BS Information Technology</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-calendar"></i>
+                            Academic Year
+                        </label>
+                        <select name="academic_year" class="form-control" required>
+                            <option value="">Select academic year</option>
+                            <option value="2023-2024">2023-2024</option>
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{% url 'student_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i>
+                    Save Student
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<!-- NO FOOTER - REMOVED -->
+{% endblock %}

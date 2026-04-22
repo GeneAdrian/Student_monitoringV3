@@ -1,0 +1,610 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Students - Student Management System</title>
+
+  <style>
+    :root {
+      --primary: #e74c3c;
+      --primary-dark: #c0392b;
+      --secondary: #2c3e50;
+      --accent: #e67e22;
+      --danger: #c0392b;
+      --warning: #f39c12;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --gray: #95a5a6;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+      --sidebar-width: 280px;
+      --sidebar-collapsed: 70px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* Main content wrapper */
+    .main-wrapper {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Content area - with margin for sidebar */
+    .content-area {
+      flex: 1;
+      margin-left: var(--sidebar-collapsed);
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: calc(100% - var(--sidebar-collapsed));
+      min-height: 100vh;
+    }
+
+    /* When sidebar is hovered */
+    .sidebar:hover ~ .main-wrapper .content-area {
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 40px;
+      height: 40px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Header */
+    .header {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 20px 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 5px;
+    }
+
+    .header-title p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 15px;
+      background: var(--light);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .user-profile:hover {
+      background: #dfe6e9;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .role-badge {
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .role-badge.admin {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Main Container */
+    .container {
+      padding: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border-radius: var(--border-radius);
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .welcome-text h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .welcome-text p {
+      opacity: 0.9;
+      max-width: 600px;
+    }
+
+    .welcome-stats {
+      display: flex;
+      gap: 30px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* Students Management Section */
+    .students-section {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light);
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .btn i {
+      font-size: 16px;
+    }
+
+    .students-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .students-table th {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--white);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .students-table th:first-child {
+      border-radius: 8px 0 0 0;
+    }
+
+    .students-table th:last-child {
+      border-radius: 0 8px 0 0;
+    }
+
+    .students-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--light);
+      transition: var(--transition);
+    }
+
+    .students-table tr {
+      transition: var(--transition);
+    }
+
+    .students-table tr:hover {
+      background: #f8f9fa;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .student-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      margin-right: 12px;
+    }
+
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .student-name {
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    .course-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #fdeded;
+      color: var(--primary-dark);
+    }
+
+    .course-badge.bsit { background: #fdeded; color: #c0392b; }
+    .course-badge.bscpe { background: #fbe9e7; color: #d84315; }
+    .course-badge.bsarch { background: #ffebee; color: #b71c1c; }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+    }
+
+    .btn-accent:hover {
+      background: #d35400;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: #a93226;
+      box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+    }
+
+    .no-students {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray);
+    }
+
+    .no-students i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .no-students h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: var(--dark);
+    }
+
+    .no-students p {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .no-students .btn {
+      background: var(--primary);
+    }
+
+    .no-students .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+  </style>
+
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- INCLUDE NAVIGATION - ETO LANG! -->
+  {% include 'navigation.html' %}
+
+  <!-- Mobile Menu Toggle Button -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <div class="content-area">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <div class="header-title">
+            <h1>Student Management</h1>
+            <p>Manage student records and information</p>
+          </div>
+          <div class="header-actions">
+            <div class="user-profile">
+              <img src="{% static 'Information_System/images/archi.jpg' %}" alt="User Avatar" class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">Admin</span>
+                <span class="user-role">
+                  <span class="role-badge admin">Administrator</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner fade-in">
+          <div class="welcome-text">
+            <h2>Student Management Portal</h2>
+            <p>Efficiently manage student records, track performance, and maintain academic information in one centralized platform.</p>
+          </div>
+          <div class="welcome-stats">
+            <div class="stat">
+              <div class="stat-value">{{ students|length }}</div>
+              <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">{{ students|length }}</div>
+              <div class="stat-label">Active Records</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">100%</div>
+              <div class="stat-label">System Ready</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Students Management Section -->
+        <div class="students-section fade-in">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-user-graduate"></i>
+              Student Records
+            </h2>
+            <a href="{% url 'add_student' %}" class="btn">
+              <i class="fas fa-plus"></i>
+              Add New Student
+            </a>
+          </div>
+
+          {% if students %}
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>Student Information</th>
+                <th>Student No.</th>
+                <th>Course</th>
+                <th>Academic Year</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td>
+                  <div class="student-info">
+                    <div class="student-avatar">
+                      {{ student.name|first|upper }}
+                    </div>
+                    <div>
+                      <div class="student-name">{{ student.name }}</div>
+                      <div style="font-size: 12px; color: var(--gray);">Active</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <strong>{{ student.student_number }}</strong>
+                </td>
+                <td>
+                  <span class="course-badge {{ student.course|lower }}">
+                    {{ student.course }}
+                  </span>
+                </td>
+                <td>
+                  <strong>{{ student.academic_year }}</strong>
+                </td>
+                <td>
+                  <div class="action-btns">
+                    <a href="{% url 'switch_student' student.id %}" class="btn btn-accent btn-sm">
+                      <i class="fas fa-exchange-alt"></i>
+                      Switch
+                    </a>
+                    <a href="{% url 'delete_student' student.id %}" class="btn btn-danger btn-sm" 
+                       onclick="return confirm('Are you sure you want to delete {{ student.name }}?');">
+                      <i class="fas fa-trash"></i>
+                      Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="no-students">
+            <i class="fas fa-users"></i>
+            <h3>No Students Found</h3>
+            <p>Get started by adding your first student to the system.</p>
+            <a href="{% url 'add_student' %}" class="btn">
+              <i class="fas fa-plus"></i>
+              Add First Student
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const contentArea = document.querySelector('.content-area');
+      const menuToggle = document.getElementById('menuToggle');
+      
+      function toggleSidebar() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.toggle('active');
+        }
+      }
+      
+      function updateMenuToggle() {
+        if (window.innerWidth <= 768) {
+          menuToggle.style.display = 'flex';
+        } else {
+          menuToggle.style.display = 'none';
+        }
+      }
+      
+      updateMenuToggle();
+      menuToggle.addEventListener('click', toggleSidebar);
+      window.addEventListener('resize', updateMenuToggle);
+
+      // Add fade-in animation to table rows
+      const tableRows = document.querySelectorAll('.students-table tbody tr');
+      tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in');
+      });
+    });
+  </script>
+</body>
+</html>

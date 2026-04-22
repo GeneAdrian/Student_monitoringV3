@@ -1,0 +1,471 @@
+{% load static %}
+<!-- Enhanced Sidebar - Red Theme Colors -->
+<aside class="sidebar" id="mainSidebar">
+  <div class="sidebar-inner">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="brand-text">
+        <h1>Architecture</h1>
+        <p>Department</p>
+      </div>
+    </div>
+
+    <div class="nav">
+      <a href="{% url 'admin_dashboard' %}" class="side-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+        <div class="icon"><i class="fas fa-tachometer-alt"></i></div>
+        <span class="text">Dashboard</span>
+      </a>
+      
+      <a href="{% url 'profile' %}" class="side-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        <div class="icon"><i class="fas fa-user"></i></div>
+        <span class="text">Profile</span>
+      </a>
+      
+      <!-- Student Management Dropdown -->
+      <div class="dropdown-section">
+        <a href="#" class="side-item dropdown-trigger {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+          <div class="icon"><i class="fas fa-users"></i></div>
+          <span class="text">Student Management</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="{% url 'student_list' %}" class="dropdown-item">View All Students</a>
+          <a href="{% url 'add_student' %}" class="dropdown-item">Add New Student</a>
+        </div>
+      </div>
+      
+      <!-- Grade Management Dropdown -->
+      <div class="dropdown-section">
+        <a href="#" class="side-item dropdown-trigger {% if 'grade' in request.resolver_match.url_name %}active{% endif %}">
+          <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+          <span class="text">Grade Management</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="{% url 'grade_management' %}" class="dropdown-item">Dashboard</a>
+          <a href="{% url 'individual' %}" class="dropdown-item">Individual Courses</a>
+          <a href="{% url 'integration' %}" class="dropdown-item">Integration Courses</a>
+          <a href="{% url 'overall' %}" class="dropdown-item">Overall Results</a>
+        </div>
+      </div>
+      
+      <a href="{% url 'logout' %}" class="side-item">
+        <div class="icon"><i class="fas fa-sign-out-alt"></i></div>
+        <span class="text">Logout</span>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Hover trigger area -->
+  <div class="sidebar-trigger"></div>
+</aside>
+
+<style>
+/* ===== SIDEBAR WITH RED THEME COLORS ===== */
+:root {
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 70px;
+  /* Red theme colors - matching the previous component */
+  --sidebar-primary: #e74c3c;        /* Vivid Red */
+  --sidebar-primary-dark: #c0392b;    /* Dark Red */
+  --sidebar-secondary: #2c3e50;       /* Dark Blue-Grey for contrast */
+  --sidebar-accent: #e67e22;          /* Orange-Red accent */
+  --sidebar-gradient-start: #c0392b;   /* Dark Red start */
+  --sidebar-gradient-end: #e74c3c;     /* Vivid Red end */
+  --sidebar-text: #ecf0f1;
+  --sidebar-text-muted: #f5b7b1;       /* Light Red/Muted text */
+  --sidebar-hover: rgba(231, 76, 60, 0.2);   /* Red hover with opacity */
+  --sidebar-active: rgba(192, 57, 43, 0.3);  /* Dark Red active with opacity */
+  --sidebar-border: rgba(236, 240, 241, 0.1);
+  --transition-speed: 0.3s;
+}
+
+/* Sidebar Base */
+.sidebar {
+  width: 70px;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-end) 100%);
+  color: var(--sidebar-text);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 4px 0 15px rgba(192, 57, 43, 0.2); /* Reddish shadow */
+  transition: width var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  overflow: hidden;
+}
+
+/* Sidebar expanded on hover or focus */
+.sidebar:hover {
+  width: var(--sidebar-width);
+}
+
+/* Inner container for scrolling */
+.sidebar-inner {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  padding-right: 5px;
+}
+
+/* Custom scrollbar */
+.sidebar-inner::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-inner::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Hover trigger area */
+.sidebar-trigger {
+  display: none;
+}
+
+/* Expand on hover - DISABLED, using JavaScript toggle instead */
+
+/* Brand Section */
+.brand {
+  padding: 25px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--sidebar-border);
+  margin-bottom: 20px;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Collapsed state for brand */
+.sidebar:not(:hover) .brand {
+  padding: 20px 10px;
+}
+
+.brand-icon {
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--sidebar-primary) 0%, var(--sidebar-accent) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  transition: all var(--transition-speed) ease;
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); /* Red shadow */
+  flex-shrink: 0;
+}
+
+/* Collapsed state for brand icon */
+.sidebar:not(:hover) .brand-icon {
+  margin-right: 0;
+}
+
+.brand-icon i {
+  font-size: 28px;
+  color: white;
+}
+
+.brand-text {
+  transition: opacity var(--transition-speed) ease;
+  opacity: 1;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.brand-text p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+  color: var(--sidebar-text-muted);
+  line-height: 1.2;
+}
+
+/* Navigation */
+.nav {
+  padding: 0 15px;
+}
+
+/* Collapsed nav styling */
+.sidebar:not(:hover) .nav {
+  padding: 0 5px;
+}
+
+.side-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 15px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  border-left: 3px solid transparent;
+}
+
+/* Collapsed state padding */
+.sidebar:not(:hover) .side-item {
+  padding: 12px 8px;
+}
+
+.side-item:hover {
+  background: var(--sidebar-hover);
+  color: white;
+  transform: translateX(5px);
+  border-left-color: var(--sidebar-primary);
+}
+
+.side-item.active {
+  background: var(--sidebar-active);
+  color: white;
+  border-left: 3px solid var(--sidebar-primary);
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+}
+
+.side-item .icon {
+  min-width: 35px;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.side-item:hover .icon {
+  background: var(--sidebar-primary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.side-item.active .icon {
+  background: var(--sidebar-primary);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.side-item i {
+  font-size: 18px;
+}
+
+.side-item .text {
+  flex: 1;
+  font-weight: 500;
+  transition: opacity var(--transition-speed) ease;
+}
+
+/* Dropdown Styles */
+.dropdown-icon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  margin-left: 5px;
+  color: var(--sidebar-text-muted);
+}
+
+.dropdown-section {
+  margin-bottom: 5px;
+}
+
+.dropdown-section.open .dropdown-icon {
+  transform: rotate(180deg);
+  color: var(--sidebar-primary);
+}
+
+.dropdown-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin-left: 47px;
+  padding-left: 15px;
+  border-left: 2px solid rgba(231, 76, 60, 0.3); /* Red border */
+}
+
+.dropdown-section.open .dropdown-menu {
+  max-height: 500px;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 15px;
+  color: var(--sidebar-text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.dropdown-item:hover {
+  background: var(--sidebar-hover);
+  color: white;
+  padding-left: 20px;
+}
+
+.dropdown-item:hover::before {
+  content: '▹';
+  position: absolute;
+  left: 5px;
+  color: var(--sidebar-primary);
+}
+
+/* Collapsed state styles - hide text when not expanded */
+.sidebar:not(:hover) .brand-text {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar:not(:hover) .dropdown-menu {
+  display: none;
+}
+
+.sidebar:not(:hover) .dropdown-icon {
+  display: none;
+}
+
+.sidebar:not(:hover) .side-item .icon {
+  margin-right: 0;
+}
+
+.sidebar:not(:hover) .side-item .text {
+  display: none;
+}
+
+/* On hover, show everything */
+.sidebar:hover .brand-text {
+  opacity: 1;
+  visibility: visible;
+  width: auto;
+}
+
+.sidebar:hover .dropdown-menu {
+  display: block;
+}
+
+.sidebar:hover .dropdown-icon {
+  display: inline;
+}
+
+.sidebar:hover .side-item .icon {
+  margin-right: 12px;
+}
+
+.sidebar:hover .side-item .text {
+  display: inline;
+}
+
+/* Tooltip for collapsed state */
+.sidebar:not(:hover) .side-item:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--sidebar-secondary);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-left: 15px;
+  z-index: 1002;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border-left: 3px solid var(--sidebar-primary); /* Red left border */
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  /* On mobile, sidebar is narrower and hidden by default */
+  .sidebar {
+    width: 0;
+    overflow: hidden;
+  }
+  
+  /* On mobile, sidebar overlays content when visible */
+  .sidebar:hover {
+    width: 240px;
+    z-index: 1001;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 240px;
+    --sidebar-collapsed-width: 50px;
+  }
+}
+
+/* Animation for active indicator */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(231, 76, 60, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
+
+.side-item.active {
+  animation: pulse 2s infinite;
+}
+</style>
+
+<script>
+// Simple sidebar with hover expansion and dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebar = document.getElementById('mainSidebar');
+  
+  // Add tooltip attributes for collapsed state
+  const sideItems = document.querySelectorAll('.side-item');
+  sideItems.forEach(item => {
+    const textSpan = item.querySelector('.text');
+    if (textSpan && textSpan.textContent.trim()) {
+      item.setAttribute('data-tooltip', textSpan.textContent.trim());
+    }
+  });
+  
+  // Dropdown toggle
+  const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
+  dropdownTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      const parent = this.closest('.dropdown-section');
+      parent.classList.toggle('open');
+    });
+  });
+});
+</script>

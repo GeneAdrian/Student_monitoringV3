@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Add Integration Grade{% endblock %}
+{% block content %}
+  <h2>Add Integration Grade</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 10px;">
+      <label for="course_name">Integration Course:</label><br>
+      <select id="course_name" name="course_name" required style="width:100%; padding:8px;">
+        <option value="">--Select Course--</option>
+        <option value="Architectural Design Project 1">Architectural Design Project 1</option>
+        <option value="Architectural Design Project 2">Architectural Design Project 2</option>
+        <option value="Urban Planning Integration">Urban Planning Integration</option>
+      </select>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <label for="grade">Grade:</label><br>
+      <input type="number" id="grade" name="grade" step="0.01" required style="width:100%; padding:8px;">
+    </div>
+    <button type="submit" style="background:#3498db;color:white;padding:10px 20px;border:none;border-radius:8px;">Save Grade</button>
+  </form>
+{% endblock %}

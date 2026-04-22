@@ -1,0 +1,823 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade Management - MySite</title>
+  
+  <style>
+    :root {
+      --primary: #e74c3c;
+      --primary-dark: #c0392b;
+      --primary-light: #fdedec;
+      --secondary: #2c3e50;
+      --secondary-light: #34495e;
+      --accent: #e67e22;
+      --accent-dark: #d35400;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --light: #ecf0f1;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --gray: #95a5a6;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(231, 76, 60, 0.1);
+      --shadow-lg: 0 10px 15px rgba(231, 76, 60, 0.15);
+      --shadow-xl: 0 20px 25px rgba(231, 76, 60, 0.2);
+      --border-radius: 12px;
+      --border-radius-lg: 16px;
+      --transition: all 0.3s ease;
+      --gradient-primary: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      --gradient-accent: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+      --gradient-secondary: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+      --sidebar-width: 280px;
+      --sidebar-collapsed: 70px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fef5f5 0%, #fde3e3 100%);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* Main content wrapper */
+    .main-wrapper {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Content area */
+    .content-area {
+      flex: 1;
+      margin-left: var(--sidebar-collapsed);
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: calc(100% - var(--sidebar-collapsed));
+      min-height: 100vh;
+    }
+
+    /* When sidebar is hovered */
+    body:has(.sidebar:hover) .content-area {
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 40px;
+      height: 40px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Enhanced Header */
+    .header {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 20px 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 5px;
+    }
+
+    .header-title p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 15px;
+      background: var(--light);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .user-profile:hover {
+      background: #fde3e3;
+      transform: translateY(-2px);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    /* Main Container */
+    .container {
+      padding: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding-bottom: 50px; /* Added padding at bottom for better spacing */
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: var(--border-radius-lg);
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .welcome-text h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .welcome-text p {
+      opacity: 0.9;
+      max-width: 600px;
+    }
+
+    .welcome-stats {
+      display: flex;
+      gap: 30px;
+    }
+
+    .stat {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* Admin Section */
+    .admin-section {
+      background: var(--white);
+      border-radius: var(--border-radius-lg);
+      padding: 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      transition: var(--transition);
+    }
+
+    .admin-section:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-5px);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light);
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    /* Performance Section */
+    .performance-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .performance-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-top: 4px solid var(--primary);
+    }
+
+    .performance-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .performance-card.individual {
+      border-top-color: var(--primary);
+    }
+
+    .performance-card.integration {
+      border-top-color: var(--accent);
+    }
+
+    .performance-card.overall {
+      border-top-color: var(--success);
+    }
+
+    .performance-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .progress-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-inner {
+      width: 90px;
+      height: 90px;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+    }
+
+    .performance-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--secondary);
+    }
+
+    .performance-desc {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    /* Admin Grid */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .admin-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      text-align: center;
+      border-left: 4px solid var(--primary);
+    }
+
+    .admin-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .admin-card i {
+      font-size: 40px;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .admin-card h4 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--secondary);
+    }
+
+    .admin-card p {
+      color: var(--gray);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-success {
+      background: var(--success);
+    }
+
+    .btn-success:hover {
+      background: #219a52;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-dark);
+    }
+
+    .btn-warning {
+      background: var(--warning);
+    }
+
+    .btn-warning:hover {
+      background: #e67e22;
+    }
+
+    .btn-secondary {
+      background: var(--gray);
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+      
+      .welcome-stats {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-collapsed: 50px;
+      }
+      
+      .content-area {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: flex;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .performance-section,
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Quick Stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+    }
+
+    .stat-icon.primary {
+      background: var(--gradient-primary);
+    }
+
+    .stat-icon.accent {
+      background: var(--gradient-accent);
+    }
+
+    .stat-icon.success {
+      background: var(--success);
+    }
+
+    .stat-icon.warning {
+      background: var(--warning);
+    }
+
+    .stat-content h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-content p {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .role-badge.admin {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .role-badge {
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- INCLUDE NAVIGATION - ETO LANG! -->
+  {% include 'navigation.html' %}
+
+  <!-- Mobile Menu Toggle Button -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <div class="content-area">
+      <!-- Enhanced Header -->
+      <header class="header">
+        <div class="header-content">
+          <div class="header-title">
+            <h1>Grade Management Dashboard</h1>
+            <p>Monitor and manage all student performance metrics</p>
+          </div>
+          <div class="header-actions">
+            <div class="user-profile">
+              <img src="{% static 'Information_System/images/archi.jpg' %}" alt="User Avatar" class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">Admin</span>
+                <span class="role-badge admin">Administrator</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="container">
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card fade-in">
+            <div class="stat-icon primary">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ students|length }}</h3>
+              <p>Total Students</p>
+            </div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-icon accent">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-content">
+              <h3>24</h3>
+              <p>Active Courses</p>
+            </div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-icon success">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ overall }}%</h3>
+              <p>Avg Performance</p>
+            </div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-icon warning">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-content">
+              <h3>156</h3>
+              <p>Pending Assessments</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner fade-in">
+          <div class="welcome-text">
+            <h2>Grade Management Center</h2>
+            <p>Monitor and manage all student performance metrics from individual subjects to comprehensive overall assessments with our advanced analytics tools.</p>
+          </div>
+          <div class="welcome-stats">
+            <div class="stat">
+              <div class="stat-value">{{ students|length }}</div>
+              <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">{{ individual }}%</div>
+              <div class="stat-label">Avg Individual</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">{{ overall }}%</div>
+              <div class="stat-label">Avg Overall</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Overview Section -->
+        <div class="admin-section fade-in">
+          <div class="section-header">
+            <h3 class="section-title"><i class="fas fa-chart-line"></i> Performance Overview</h3>
+          </div>
+
+          <!-- Performance Cards -->
+          <div class="performance-section">
+            <div class="performance-card individual fade-in">
+              <a href="{% url 'individual' %}" class="performance-link">
+                <div class="progress-circle" style="--percent: {{ individual }}; background: conic-gradient(var(--primary) calc({{ individual }} * 1%), var(--light) 0%);">
+                  <div class="progress-inner">
+                    {{ individual }}%
+                  </div>
+                </div>
+                <h3 class="performance-title">Individual Performance</h3>
+                <p class="performance-desc">Current student's subject performance</p>
+              </a>
+            </div>
+
+            <div class="performance-card integration fade-in">
+              <a href="{% url 'integration' %}" class="performance-link">
+                <div class="progress-circle" style="--percent: {{ integration }}; background: conic-gradient(var(--accent) calc({{ integration }} * 1%), var(--light) 0%);">
+                  <div class="progress-inner">
+                    {{ integration }}%
+                  </div>
+                </div>
+                <h3 class="performance-title">Integration</h3>
+                <p class="performance-desc">Cross-subject performance metrics</p>
+              </a>
+            </div>
+
+            <div class="performance-card overall fade-in">
+              <a href="{% url 'overall' %}" class="performance-link">
+                <div class="progress-circle" style="--percent: {{ overall }}; background: conic-gradient(var(--success) calc({{ overall }} * 1%), var(--light) 0%);">
+                  <div class="progress-inner">
+                    {{ overall }}%
+                  </div>
+                </div>
+                <h3 class="performance-title">Overall Performance</h3>
+                <p class="performance-desc">Comprehensive performance overview</p>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade Management Actions -->
+        <div class="admin-section fade-in">
+          <div class="section-header">
+            <h3 class="section-title"><i class="fas fa-cogs"></i> Grade Management Tools</h3>
+          </div>
+
+          <div class="admin-grid">
+            <div class="admin-card fade-in">
+              <i class="fas fa-user-edit"></i>
+              <h4>Individual Grades</h4>
+              <p>Manage subject-specific grades and assessments</p>
+              <a href="{% url 'individual' %}" class="btn btn-sm">Manage Grades</a>
+            </div>
+            <div class="admin-card fade-in">
+              <i class="fas fa-project-diagram"></i>
+              <h4>Integration Grades</h4>
+              <p>Handle cross-subject integrated assessments</p>
+              <a href="{% url 'integration' %}" class="btn btn-sm btn-accent">Manage Grades</a>
+            </div>
+            <div class="admin-card fade-in">
+              <i class="fas fa-chart-pie"></i>
+              <h4>Overall Performance</h4>
+              <p>View comprehensive student performance data</p>
+              <a href="{% url 'overall' %}" class="btn btn-sm btn-success">View Reports</a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const contentArea = document.querySelector('.content-area');
+      const menuToggle = document.getElementById('menuToggle');
+      
+      // Mobile menu toggle
+      function toggleSidebar() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.toggle('active');
+        }
+      }
+      
+      function updateMenuToggle() {
+        if (window.innerWidth <= 768) {
+          menuToggle.style.display = 'flex';
+        } else {
+          menuToggle.style.display = 'none';
+        }
+      }
+      
+      updateMenuToggle();
+      menuToggle.addEventListener('click', toggleSidebar);
+      window.addEventListener('resize', updateMenuToggle);
+      
+      // Active nav item
+      const currentPath = window.location.pathname;
+      const navItems = document.querySelectorAll('.side-item');
+      
+      navItems.forEach(item => {
+        if (item.getAttribute('href') === currentPath) {
+          item.classList.add('active');
+        }
+      });
+
+      // Animations
+      const cards = document.querySelectorAll('.admin-card, .performance-card, .stat-card, .fade-in');
+      cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+      });
+
+      // Progress circle hover
+      const progressCircles = document.querySelectorAll('.progress-circle');
+      progressCircles.forEach(circle => {
+        circle.addEventListener('mouseenter', function() {
+          this.style.transform = 'scale(1.1)';
+        });
+        circle.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!-- Information_System/templates/signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIP Architecture · Admin Registration</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .registration-card {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 48px;
+            box-shadow: 0 30px 60px -15px rgba(0, 20, 40, 0.3);
+            padding: 2.8rem;
+        }
+
+        /* Messages */
+        .messages-container {
+            margin-bottom: 2rem;
+        }
+
+        .message {
+            background: #fee9e7;
+            border-radius: 60px;
+            padding: 0.9rem 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a03220;
+            border: 1px solid #fbc5be;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .message i {
+            color: #c0392b;
+            font-size: 1.2rem;
+        }
+
+        .message.success {
+            background: #e3f7e3;
+            color: #1e7e34;
+            border-color: #b8e0b8;
+        }
+
+        .message.success i {
+            color: #2e7d32;
+        }
+
+        .message.info {
+            background: #e3f0ff;
+            color: #0b5e8a;
+            border-color: #b8d6f0;
+        }
+
+        .message.info i {
+            color: #0a58ca;
+        }
+
+        /* Register tab */
+        .tab-register-only {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0b1f3b;
+            margin-bottom: 1.2rem;
+            border-bottom: 3px solid #e74c3c;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Administrator Access */
+        .admin-access-title {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #647b9e;
+            margin: 1.5rem 0 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-access-title i {
+            color: #e74c3c;
+            font-size: 1.1rem;
+        }
+
+        /* Admin Registration Form */
+        .admin-register-card {
+            background: #fafcff;
+            border-radius: 32px;
+            padding: 2rem;
+            border: 1px solid #e4e9f2;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.02);
+            margin-bottom: 1rem;
+        }
+
+        .admin-register-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 1.4rem;
+        }
+
+        .admin-register-header i {
+            font-size: 2.2rem;
+            color: white;
+            background: #e74c3c;
+            padding: 12px;
+            border-radius: 22px;
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.2);
+        }
+
+        .admin-register-header h3 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #121f33;
+        }
+
+        /* Show form errors */
+        .error-messages {
+            margin-bottom: 1.5rem;
+        }
+
+        .error-item {
+            background: #fee9e7;
+            color: #c0392b;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #c0392b;
+        }
+
+        .error-item i {
+            color: #c0392b;
+        }
+
+        /* Form fields */
+        .input-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7e8c9e;
+            font-size: 1rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e5e9f0;
+            border-radius: 18px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.15s;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: #9aa9b9;
+        }
+
+        /* Metadata: Program Chair only · Admin code required */
+        .admin-metadata {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px 24px;
+            margin: 1.2rem 0 1.8rem 0;
+            color: #2e405b;
+            font-weight: 500;
+            font-size: 1rem;
+            background: #fef2f0;
+            padding: 0.9rem 1.6rem;
+            border-radius: 60px;
+            border: 1px solid #fad2cc;
+        }
+
+        .admin-metadata i {
+            color: #e74c3c;
+            margin-right: 6px;
+        }
+
+        .admin-metadata .dot {
+            width: 5px;
+            height: 5px;
+            background: #c0aeb0;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 6px;
+        }
+
+        /* Register button */
+        .btn-register-admin {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 1.2rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 0.8rem 0 1.2rem 0;
+            box-shadow: 0 8px 18px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-register-admin:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(192, 57, 43, 0.3);
+        }
+
+        /* Back to Login link */
+        .back-to-login-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #1e3b5c;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 0.6rem 1rem;
+            transition: 0.15s;
+            border-radius: 40px;
+        }
+
+        .back-to-login-link i {
+            color: #e74c3c;
+            transition: transform 0.2s;
+        }
+
+        .back-to-login-link:hover {
+            color: #e74c3c;
+        }
+
+        .back-to-login-link:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* Version footer */
+        .version-remark {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #9aafc9;
+            margin-top: 1.8rem;
+            border-top: 1px dashed #d9e2ec;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .version-remark i {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-card">
+        <!-- ALL MESSAGES (LOGOUT, ERROR, SUCCESS, INFO) -->
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                <i class="fas 
+                    {% if message.tags == 'error' %}fa-exclamation-circle
+                    {% elif message.tags == 'success' %}fa-check-circle
+                    {% elif message.tags == 'info' %}fa-info-circle
+                    {% else %}fa-bell{% endif %}">
+                </i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Register tab -->
+        <div class="tab-register-only">
+            Register
+        </div>
+
+        <!-- Administrator Access -->
+        <div class="admin-access-title">
+            <i class="fas fa-user-shield"></i> Administrator Access
+        </div>
+
+        <!-- Admin Registration Form -->
+        <div class="admin-register-card">
+            <div class="admin-register-header">
+                <i class="fas fa-shield-halved"></i>
+                <h3>Register as Administrator</h3>
+            </div>
+
+            <!-- Show form errors from Django form -->
+            {% if form.errors %}
+                <div class="error-messages">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <div class="error-item">
+                                <i class="fas fa-exclamation-circle"></i> 
+                                {% if field != '__all__' %}{{ field|title }}: {% endif %}{{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Non-field specific errors (like password mismatch) -->
+            {% if form.non_field_errors %}
+                <div class="error-messages">
+                    {% for error in form.non_field_errors %}
+                        <div class="error-item">
+                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'signup' %}">
+                {% csrf_token %}
+                
+                <!-- Username field -->
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" 
+                           name="username" 
+                           placeholder="Username" 
+                           value="{{ form.username.value|default:'' }}"
+                           required>
+                </div>
+
+                <!-- First Name (optional) -->
+                <div class="input-group">
+                    <i class="fas fa-signature"></i>
+                    <input type="text" 
+                           name="first_name" 
+                           placeholder="First Name (optional)" 
+                           value="{{ form.first_name.value|default:'' }}">
+                </div>
+
+                <!-- Last Name (optional) -->
+                <div class="input-group">
+                    <i class="fas fa-signature"></i>
+                    <input type="text" 
+                           name="last_name" 
+                           placeholder="Last Name (optional)" 
+                           value="{{ form.last_name.value|default:'' }}">
+                </div>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" 
+                           name="password" 
+                           placeholder="Password" 
+                           required>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" 
+                           name="confirm_password" 
+                           placeholder="Confirm Password" 
+                           required>
+                </div>
+
+                <!-- Admin Authorization Code -->
+                <div class="input-group">
+                    <i class="fas fa-key"></i>
+                    <input type="password" 
+                           name="auth_code" 
+                           placeholder="Admin Authorization Code" 
+                           value="{{ form.auth_code.value|default:'' }}"
+                           required>
+                </div>
+
+                <!-- Metadata: Program Chair only · Admin code required -->
+                <div class="admin-metadata">
+                    <span><i class="fas fa-gavel"></i> Program Chair only</span>
+                    <span class="dot"></span>
+                    <span><i class="fas fa-key"></i> Admin code required</span>
+                </div>
+
+                <!-- Register button -->
+                <button type="submit" class="btn-register-admin">
+                    <i class="fas fa-plus-circle"></i> Register as Administrator
+                </button>
+
+                <!-- Back to Login link -->
+                <a href="{% url 'login' %}" class="back-to-login-link">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </a>
+            </form>
+        </div>
+
+        <!-- Version footer -->
+        <div class="version-remark">
+            <span><i class="fas fa-code-branch"></i> Version 1.0.0</span>
+            <span>© TIP Architecture</span>
+        </div>
+    </div>
+</body>
+</html>
